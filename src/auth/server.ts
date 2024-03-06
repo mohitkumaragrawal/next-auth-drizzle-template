@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
-import GitHubProvider from "next-auth/providers/github";
-import GoogleProvider from "next-auth/providers/google";
+import GitHubProvider from "@auth/core/providers/github";
+import GoogleProvider from "@auth/core/providers/google";
 
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import db from "@/db";
@@ -102,6 +102,7 @@ export const {
     GitHubProvider({
       clientId: process.env.GITHUB_ID!,
       clientSecret: process.env.GITHUB_SECRET!,
+      allowDangerousEmailAccountLinking: true,
       profile: (p) => {
         return {
           id: p.id.toString(),
@@ -115,6 +116,7 @@ export const {
     GoogleProvider({
       clientId: process.env.GOOGLE_ID!,
       clientSecret: process.env.GOOGLE_SECRET!,
+      allowDangerousEmailAccountLinking: true,
       profile: (p) => {
         // should be unique?
         const username =
@@ -124,6 +126,7 @@ export const {
           Number(Date.now()).toString(36);
 
         return {
+          id: p.id,
           name: p.name,
           email: p.email,
           image: p.picture,
