@@ -5,9 +5,6 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
-  '7':
-    specifier: ^0.0.1
-    version: 0.0.1
   '@auth/core':
     specifier: ^0.28.0
     version: 0.28.0
@@ -210,10 +207,6 @@ devDependencies:
     version: 5.3.3
 
 packages:
-
-  /7@0.0.1:
-    resolution: {integrity: sha512-o9Q7is0K/9DsIRFke4wkUu3f9mVNC+n1wZHG71FAo1U1vhsj7WrUpRfHHrMR11o7jC22xH/6jd5KND/8rhDRlQ==}
-    dev: false
 
   /@aashutoshrathi/word-wrap@1.2.6:
     resolution: {integrity: sha512-1Yjs2SvM8TflER/OD3cOjhWWOZb58A2t7wpE2S9XfBYTiIl+XFhQG2bjy4Pu1I+EAlCNUzRDYDdFwFYUKvXcIA==}

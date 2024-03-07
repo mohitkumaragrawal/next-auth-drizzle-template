@@ -48,126 +48,7 @@ import { toast } from "sonner";
 import { RowAction } from "./row-action";
 
 import type { UserWithRoles } from "@/db/types";
-
-export const columns: ColumnDef<UserWithRoles>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          (table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() &&
-              "indeterminate")) as CheckedState
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "name",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Name
-          <CaretSortIcon className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="flex flex-row gap-3 items-center">
-        <ProfileImage imageUrl={row.original.image} />
-        {row.getValue("name")}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "email",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Email
-          <CaretSortIcon className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
-  },
-  {
-    accessorKey: "username",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Username
-          <CaretSortIcon className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="flex flex-row gap-3 items-center">
-        {row.getValue("username")}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "roles",
-    header: () => <p>Roles</p>,
-    cell: ({ row }) => (
-      <div className="flex flex-wrap gap-1">
-        {row.original.roles.map((role) => (
-          <Badge key={role} variant="secondary" className="justify-center">
-            {role}
-          </Badge>
-        ))}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "createdAt",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Joined On
-          <CaretSortIcon className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="text-sm text-muted-foreground">
-        {row.original.createdAt.toDateString()}
-      </div>
-    ),
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const user = row.original;
-      return <RowAction userId={user.id} />;
-    },
-  },
-];
+import editRoles from "@/actions/edit-roles";
 
 export function UsersDataTable({
   data: initialData,
@@ -191,6 +72,164 @@ export function UsersDataTable({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+
+  const handleRoleChange = React.useCallback(
+    (userId: string, roles: string[]) => {
+      const changeRoles = async () => {
+        await editRoles(userId, roles);
+        await refreshData();
+      };
+      setLoading(true);
+      toast.promise(changeRoles(), {
+        loading: "Updating Roles...",
+        error: (e) => `Error: ${e.message}`,
+        success: "Roles updated successfully!",
+        finally: () => setLoading(false),
+      });
+    },
+    [],
+  );
+
+  const columns: ColumnDef<UserWithRoles>[] = React.useMemo(
+    () => [
+      {
+        id: "select",
+        header: ({ table }) => (
+          <Checkbox
+            checked={
+              (table.getIsAllPageRowsSelected() ||
+                (table.getIsSomePageRowsSelected() &&
+                  "indeterminate")) as CheckedState
+            }
+            onCheckedChange={(value) =>
+              table.toggleAllPageRowsSelected(!!value)
+            }
+            aria-label="Select all"
+          />
+        ),
+        cell: ({ row }) => (
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+          />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+      },
+      {
+        accessorKey: "name",
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+            >
+              Name
+              <CaretSortIcon className="ml-2 h-4 w-4" />
+            </Button>
+          );
+        },
+        cell: ({ row }) => (
+          <div className="flex flex-row gap-3 items-center">
+            <ProfileImage imageUrl={row.original.image} />
+            {row.getValue("name")}
+          </div>
+        ),
+      },
+      {
+        accessorKey: "email",
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+            >
+              Email
+              <CaretSortIcon className="ml-2 h-4 w-4" />
+            </Button>
+          );
+        },
+        cell: ({ row }) => (
+          <div className="lowercase">{row.getValue("email")}</div>
+        ),
+      },
+      {
+        accessorKey: "username",
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+            >
+              Username
+              <CaretSortIcon className="ml-2 h-4 w-4" />
+            </Button>
+          );
+        },
+        cell: ({ row }) => (
+          <div className="flex flex-row gap-3 items-center">
+            {row.getValue("username")}
+          </div>
+        ),
+      },
+      {
+        accessorKey: "roles",
+        header: () => <p>Roles</p>,
+        cell: ({ row }) => (
+          <div className="flex flex-wrap gap-1">
+            {row.original.roles.map((role) => (
+              <Badge key={role} variant="secondary" className="justify-center">
+                {role}
+              </Badge>
+            ))}
+          </div>
+        ),
+      },
+      {
+        accessorKey: "createdAt",
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+            >
+              Joined On
+              <CaretSortIcon className="ml-2 h-4 w-4" />
+            </Button>
+          );
+        },
+        cell: ({ row }) => (
+          <div className="text-sm text-muted-foreground">
+            {row.original.createdAt.toDateString()}
+          </div>
+        ),
+      },
+      {
+        id: "actions",
+        enableHiding: false,
+        cell: ({ row }) => {
+          const user = row.original;
+          return (
+            <RowAction
+              userId={user.id}
+              roles={user.roles}
+              onConfirm={(roles) => handleRoleChange(user.id, roles)}
+            />
+          );
+        },
+      },
+    ],
+    [],
+  );
 
   const table = useReactTable({
     data,
