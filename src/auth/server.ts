@@ -93,7 +93,7 @@ export const {
         user: {
           ...session.user,
           id: user.id,
-          roles: user.roles.map((r) => r.role),
+          role: user.roles.map((r) => r.role),
         },
       };
     },
@@ -104,10 +104,15 @@ export const {
       clientSecret: process.env.GITHUB_SECRET!,
       allowDangerousEmailAccountLinking: true,
       profile: (p) => {
+        const username =
+          p.login.replace(/\s/g, "-").toLowerCase() +
+          "-" +
+          generateRandomId(2) +
+          Number(Date.now()).toString(36);
         return {
           id: p.id.toString(),
           name: p.name,
-          username: p.login,
+          username: username,
           email: p.email,
           image: p.avatar_url,
         };

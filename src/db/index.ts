@@ -1,7 +1,15 @@
-import { drizzle } from "drizzle-orm/postgres-js";
+import { PostgresJsDatabase, drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
-const client = postgres(process.env.DATABASE_URL!);
-const db = drizzle(client);
+type PostgresDrizzleClient = PostgresJsDatabase<Record<string, never>>;
+
+const globalForDrizzle = globalThis as unknown as {
+  drizzle: PostgresDrizzleClient | undefined;
+};
+
+const db =
+  globalForDrizzle.drizzle ??
+  drizzle(postgres(process.env.DATABASE_URL!), { logger: true });
 
 export default db;
+if (process.env.NODE_ENV !== "production") globalForDrizzle.drizzle = db;

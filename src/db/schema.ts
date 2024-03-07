@@ -6,6 +6,7 @@ import {
   integer,
   serial,
   unique,
+  boolean,
 } from "drizzle-orm/pg-core";
 
 import type { AdapterAccount } from "@auth/core/adapters";
@@ -17,6 +18,11 @@ export const users = pgTable("user", {
   emailVerified: timestamp("emailVerified", { mode: "date" }),
   image: text("image"),
   username: text("username").unique(),
+
+  banned: boolean("banned").default(false),
+  bio: text("bio").default(""),
+  createdAt: timestamp("createdAt").notNull().defaultNow(),
+  gender: text("gender").default(""),
 });
 
 export const userRoles = pgTable(

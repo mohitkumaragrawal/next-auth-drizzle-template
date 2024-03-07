@@ -11,7 +11,7 @@ import ProfileDropdown from "./profile-dropdown";
 
 const poppins = Poppins({
   subsets: ["latin"],
-  weight: "900",
+  weight: ["900", "600"],
   style: "normal",
 });
 
@@ -21,7 +21,9 @@ export async function NavBar() {
   return (
     <nav className="border-b px-5 py-3 flex items-center justify-between">
       <Link href={"/"}>
-        <p className={cn("text-2xl font-semibold", poppins.className)}>Logo</p>
+        <p className={cn("text-xl font-semibold", poppins.className)}>
+          Template
+        </p>
       </Link>
 
       <div className="flex items-center gap-3">
