@@ -9,7 +9,7 @@ const globalForDrizzle = globalThis as unknown as {
 
 const db =
   globalForDrizzle.drizzle ??
-  drizzle(postgres(process.env.DATABASE_URL!), { logger: true });
+  drizzle(postgres(process.env.DATABASE_URL!), { logger: false });
 
 export default db;
 if (process.env.NODE_ENV !== "production") globalForDrizzle.drizzle = db;

@@ -1,7 +1,7 @@
 "use client";
 
 import { signOut } from "next-auth/react";
-import { LayoutDashboardIcon, LogOutIcon } from "lucide-react";
+import { LayoutDashboardIcon, LogOutIcon, UserIcon } from "lucide-react";
 
 import Link from "next/link";
 
@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import type { Session } from "next-auth";
+import hasRole from "@/data/has-role";
+import { DropdownMenuSub } from "@radix-ui/react-dropdown-menu";
 
 interface Props {
   session: Session;
@@ -36,6 +38,8 @@ export default function ProfileDropdown({ session, status }: Props) {
   const handleLogout = () => {
     signOut();
   };
+
+  const owner = hasRole(session, "owner");
 
   if (status === "authenticated") {
     return (
@@ -73,7 +77,23 @@ export default function ProfileDropdown({ session, status }: Props) {
               Dashboard
             </DropdownMenuItem>
           </Link>
-          <DropdownMenuItem onClick={handleLogout}>
+
+          {owner && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel className="">Owner</DropdownMenuLabel>
+
+              <Link href="/admin/users">
+                <DropdownMenuItem>
+                  <UserIcon className="mr-3" />
+                  Manage Users
+                </DropdownMenuItem>
+              </Link>
+            </>
+          )}
+          <DropdownMenuSeparator />
+
+          <DropdownMenuItem onClick={handleLogout} className="text-red-600">
             <LogOutIcon className="mr-3" />
             Sign out
           </DropdownMenuItem>
