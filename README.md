@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Next.js + PostgreSQL + Auth.js + Drizzle Starter
 
-## Getting Started
+This Next.js template integrates PostgreSQL for database management, Auth.js for Google and GitHub authentication, and Drizzle as the ORM. It provides features like Google and GitHub authentication, role-based user authentication, and a user management page.
 
-First, run the development server:
+### Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Google and GitHub authentication
+- Role-based user authentication with a visually appealing login page
+- User Management page
+
+### Getting Started
+
+#### 1. Clone the Repository and Install Dependencies
+
+Clone the repository and delete the .git folder to initialize your own git repository.
+
+```
+git clone https://github.com/mohitkumaragrawal/next-auth-drizzle-template.git
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then, install dependencies using pnpm.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+pnpm i
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+#### 2. Create a `.env` file in your root directory
 
-## Learn More
+Copy the .env.example file to .env.
 
-To learn more about Next.js, take a look at the following resources:
+#### 3. Setup your Github OAuth Client
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Create your own [Github OAuth Client](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app)
+- Add http://localhost:3000/api/auth/callback/github to the
+  callback url
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+- Copy the respective GITHUB_ID and GITHUB_SECRET to the `.env` file
 
-## Deploy on Vercel
+#### 4. Setup your Google OAuth Client
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- [Google OAuth Configuration](https://console.developers.google.com/apis/credentials)
+- Callback Url: http://localhost:3000/api/auth/callback/google
+- Copy the respective GOOGLE_ID and GOOGLE_SECRET to the .env file
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+#### 5. Generate the `NEXTAUTH_SECRET`
+
+- Run this command to generate the NEXTAUTH_SECRET
+
+```
+openssl rand -base64 32
+```
+
+#### 6. Setup your database
+
+- I'm using Docker to spin up PostgreSQL just install docker
+  and run `sudo docker-compose up -d`
+
+- Create all the required tables in the database using `pnpm db:push`
+
+#### 7. You are all set!
+
+- Run the development server
+
+```
+pnpm dev
+```
+
+- Optionally, open Drizzle Studio using pnpm db:studio and assign the owner role to yourself by adding a row in the userRole table with your user ID as the userId and owner as the role.
+
+Now, you're ready to start developing with this Next.js template!
