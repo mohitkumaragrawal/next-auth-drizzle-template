@@ -9,7 +9,7 @@ export default async function UserManagementPage() {
 
   return (
     <Container className="max-w-[80rem]">
-      <Heading1 subheading="View and Manage users" className="mt-16 mb-8">
+      <Heading1 subheading="View and Manage users" className="mb-8 mt-16">
         Users
       </Heading1>
       <UsersDataTable data={users} />

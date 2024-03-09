@@ -133,7 +133,7 @@ export function UsersDataTable({
           );
         },
         cell: ({ row }) => (
-          <div className="flex flex-row gap-3 items-center">
+          <div className="flex flex-row items-center gap-3">
             <ProfileImage imageUrl={row.original.image} />
             {row.getValue("name")}
           </div>
@@ -174,7 +174,7 @@ export function UsersDataTable({
           );
         },
         cell: ({ row }) => (
-          <div className="flex flex-row gap-3 items-center">
+          <div className="flex flex-row items-center gap-3">
             {row.getValue("username")}
           </div>
         ),
@@ -312,7 +312,7 @@ export function UsersDataTable({
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4 justify-between gap-1">
+      <div className="flex items-center justify-between gap-1 py-4">
         <Input
           placeholder="Filter emails..."
           value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
@@ -348,7 +348,7 @@ export function UsersDataTable({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <div className="flex gap-2 flex-row-reverse mb-3">
+      <div className="mb-3 flex flex-row-reverse gap-2">
         <Button variant="outline" onClick={refreshData}>
           Refresh
         </Button>

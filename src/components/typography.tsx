@@ -17,7 +17,7 @@ export function Heading1({ className, children, subheading }: TypographyProps) {
   return (
     <h1 className={className}>
       <p className={cn("text-4xl font-bold", poppins.className)}>{children}</p>
-      <p className="text-muted-foreground mt-1">{subheading}</p>
+      <p className="mt-1 text-muted-foreground">{subheading}</p>
     </h1>
   );
 }

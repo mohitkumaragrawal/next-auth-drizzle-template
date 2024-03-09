@@ -27,7 +27,7 @@ export default function LoginPage() {
   return (
     <Card className="w-full max-w-[400px]">
       <CardHeader>
-        <p className={cn("font-bold text-2xl", poppins.className)}>
+        <p className={cn("text-2xl font-bold", poppins.className)}>
           Welcome Back
         </p>
         <p className="text-muted-foreground">Login to continue</p>

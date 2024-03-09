@@ -19,7 +19,7 @@ export async function NavBar() {
   const session = await auth();
 
   return (
-    <nav className="border-b px-5 py-3 flex items-center justify-between">
+    <nav className="flex items-center justify-between border-b px-5 py-3">
       <Link href={"/"}>
         <p className={cn("text-xl font-semibold", poppins.className)}>
           Template

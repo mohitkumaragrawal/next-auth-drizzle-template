@@ -110,7 +110,7 @@ export function RowAction(props: RowActionProps) {
           {roles.map((role) => (
             <Badge
               key={role}
-              className="flex gap-1 justify-between items-center cursor-pointer group"
+              className="group flex cursor-pointer items-center justify-between gap-1"
               variant="outline"
               onClick={() => {
                 setRoles(roles.filter((r) => r !== role));
@@ -118,7 +118,7 @@ export function RowAction(props: RowActionProps) {
             >
               {role}
 
-              <div className="hover:text-red-400 group-hover:text-red-400 cursor-pointer">
+              <div className="cursor-pointer hover:text-red-400 group-hover:text-red-400">
                 <XIcon size={14} />
               </div>
             </Badge>

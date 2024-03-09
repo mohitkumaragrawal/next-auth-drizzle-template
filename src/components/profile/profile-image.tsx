@@ -8,7 +8,7 @@ export default function ProfileImage({ imageUrl }: ProfileImageProps) {
     <img
       src={imageUrl ?? ""}
       alt="profile imge"
-      className="min-w-10 min-h-10 w-10 h-10 rounded-full overflow-hidden"
+      className="h-10 min-h-10 w-10 min-w-10 overflow-hidden rounded-full"
       referrerPolicy="no-referrer"
     />
   );
