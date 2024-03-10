@@ -5,6 +5,7 @@ const poppins = Poppins({
   subsets: ["latin"],
   weight: ["900", "700", "600"],
   style: "normal",
+  fallback: ["sans-serif"],
 });
 
 interface TypographyProps {

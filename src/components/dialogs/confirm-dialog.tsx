@@ -35,7 +35,7 @@ export default function ConfirmDialog(props: Props) {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={(e) => props.onConfirm()}>
+          <AlertDialogAction onClick={() => props.onConfirm()}>
             Continue
           </AlertDialogAction>
         </AlertDialogFooter>
