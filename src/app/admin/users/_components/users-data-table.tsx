@@ -87,7 +87,7 @@ export function UsersDataTable({
         finally: () => setLoading(false),
       });
     },
-    [],
+    [refreshData],
   );
 
   const columns: ColumnDef<UserWithRoles>[] = React.useMemo(
@@ -228,7 +228,7 @@ export function UsersDataTable({
         },
       },
     ],
-    [],
+    [handleRoleChange],
   );
 
   const table = useReactTable({
@@ -454,7 +454,6 @@ export function UsersDataTable({
           </TableBody>
         </Table>
       </div>
-
       <DataTablePagination table={table} className="my-3" />
     </div>
   );
