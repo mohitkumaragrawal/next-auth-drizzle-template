@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { signOut } from "next-auth/react";
@@ -17,7 +18,6 @@ import {
 
 import type { Session } from "next-auth";
 import hasRole from "@/data/has-role";
-import { DropdownMenuSub } from "@radix-ui/react-dropdown-menu";
 
 interface Props {
   session: Session;
@@ -54,6 +54,7 @@ export default function ProfileDropdown({ session, status }: Props) {
               src={session?.user?.image ?? ""}
               alt="profile imge"
               className="h-full w-full object-cover"
+              referrerPolicy="no-referrer"
             />
           </Button>
         </DropdownMenuTrigger>
@@ -64,6 +65,7 @@ export default function ProfileDropdown({ session, status }: Props) {
               src={session?.user?.image ?? ""}
               alt="profile imge"
               className="h-10 w-10 overflow-hidden rounded-full"
+              referrerPolicy="no-referrer"
             />
             <div>
               <p>{session.user.name}</p>

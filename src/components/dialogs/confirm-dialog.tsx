@@ -13,16 +13,26 @@ import {
 } from "@/components/ui/alert-dialog";
 
 interface Props {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   title?: string;
   description?: string;
   onConfirm(): void;
+
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  defaultOpen?: boolean;
 }
 
 export default function ConfirmDialog(props: Props) {
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>{props.children}</AlertDialogTrigger>
+    <AlertDialog
+      open={props.open}
+      onOpenChange={props.onOpenChange}
+      defaultOpen={props.defaultOpen}
+    >
+      {props.children && (
+        <AlertDialogTrigger asChild>{props.children}</AlertDialogTrigger>
+      )}
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>

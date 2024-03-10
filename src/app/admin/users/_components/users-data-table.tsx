@@ -1,11 +1,11 @@
 "use client";
 import * as React from "react";
-import { CaretSortIcon, ChevronDownIcon } from "@radix-ui/react-icons";
 import {
   ColumnDef,
   ColumnFiltersState,
   SortingState,
   VisibilityState,
+  createColumnHelper,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -16,28 +16,14 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import ProfileImage from "@/components/profile/profile-image";
-import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { BanIcon, TrashIcon } from "lucide-react";
+import { BanIcon, RefreshCcwIcon, TrashIcon } from "lucide-react";
 
 import { DataTablePagination } from "@/components/data-table/data-table-pagination";
+import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
+import { DataTableViewOptions } from "@/components/data-table/data-table-view-options";
 
 import { fetchUsers } from "@/data/fetch-users";
 import ConfirmDialog from "@/components/dialogs/confirm-dialog";
@@ -49,6 +35,18 @@ import { RowAction } from "./row-action";
 
 import type { UserWithRoles } from "@/db/types";
 import editRoles from "@/actions/edit-roles";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { cn } from "@/lib/utils";
+
+const columnHelper = createColumnHelper<UserWithRoles>();
 
 export function UsersDataTable({
   data: initialData,
@@ -57,7 +55,6 @@ export function UsersDataTable({
 }) {
   const [data, setData] = React.useState(initialData);
   const [loading, setLoading] = React.useState(false);
-
   const refreshData = React.useCallback(async () => {
     setLoading(true);
     const newData = await fetchUsers();
@@ -73,26 +70,32 @@ export function UsersDataTable({
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  const handleRoleChange = React.useCallback(
-    (userId: string, roles: string[]) => {
-      const changeRoles = async () => {
-        await editRoles(userId, roles);
+  const asyncUpdateData = React.useCallback(
+    (
+      updater: Promise<void>,
+      _toasterData: { loading?: string; error?: string; success?: string } = {},
+    ) => {
+      setLoading(true);
+
+      const updaterWithRefresh = async () => {
+        await updater;
         await refreshData();
       };
-      setLoading(true);
-      toast.promise(changeRoles(), {
-        loading: "Updating Roles...",
-        error: (e) => `Error: ${e.message}`,
-        success: "Roles updated successfully!",
+
+      toast.promise(updaterWithRefresh(), {
         finally: () => setLoading(false),
+        ..._toasterData,
       });
     },
     [refreshData],
   );
 
+  const selectedIds = () =>
+    table.getSelectedRowModel().rows.map((row) => row.original.id);
+
   const columns: ColumnDef<UserWithRoles>[] = React.useMemo(
     () => [
-      {
+      columnHelper.display({
         id: "select",
         header: ({ table }) => (
           <Checkbox
@@ -116,72 +119,39 @@ export function UsersDataTable({
         ),
         enableSorting: false,
         enableHiding: false,
-      },
-      {
-        accessorKey: "name",
-        header: ({ column }) => {
-          return (
-            <Button
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-            >
-              Name
-              <CaretSortIcon className="ml-2 h-4 w-4" />
-            </Button>
-          );
-        },
+      }),
+      columnHelper.accessor("name", {
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Name" />
+        ),
         cell: ({ row }) => (
           <div className="flex flex-row items-center gap-3">
             <ProfileImage imageUrl={row.original.image} />
             {row.getValue("name")}
           </div>
         ),
-      },
-      {
-        accessorKey: "email",
-        header: ({ column }) => {
-          return (
-            <Button
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-            >
-              Email
-              <CaretSortIcon className="ml-2 h-4 w-4" />
-            </Button>
-          );
-        },
+      }),
+      columnHelper.accessor("email", {
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Email" />
+        ),
         cell: ({ row }) => (
           <div className="lowercase">{row.getValue("email")}</div>
         ),
-      },
-      {
-        accessorKey: "username",
-        header: ({ column }) => {
-          return (
-            <Button
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-            >
-              Username
-              <CaretSortIcon className="ml-2 h-4 w-4" />
-            </Button>
-          );
-        },
+      }),
+      columnHelper.accessor("username", {
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Username" />
+        ),
         cell: ({ row }) => (
           <div className="flex flex-row items-center gap-3">
+            {" "}
             {row.getValue("username")}
           </div>
         ),
-      },
-      {
-        accessorKey: "roles",
-        header: () => <p>Roles</p>,
+      }),
+      columnHelper.accessor("roles", {
+        header: "Roles",
         cell: ({ row }) => (
           <div className="flex flex-wrap gap-1">
             {row.original.roles.map((role) => (
@@ -191,29 +161,18 @@ export function UsersDataTable({
             ))}
           </div>
         ),
-      },
-      {
-        accessorKey: "createdAt",
-        header: ({ column }) => {
-          return (
-            <Button
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-            >
-              Joined On
-              <CaretSortIcon className="ml-2 h-4 w-4" />
-            </Button>
-          );
-        },
+      }),
+      columnHelper.accessor("createdAt", {
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Joined On" />
+        ),
         cell: ({ row }) => (
           <div className="text-sm text-muted-foreground">
             {row.original.createdAt.toDateString()}
           </div>
         ),
-      },
-      {
+      }),
+      columnHelper.display({
         id: "actions",
         enableHiding: false,
         cell: ({ row }) => {
@@ -222,13 +181,19 @@ export function UsersDataTable({
             <RowAction
               userId={user.id}
               roles={user.roles}
-              onConfirm={(roles) => handleRoleChange(user.id, roles)}
+              onRolesChange={(roles) =>
+                asyncUpdateData(editRoles(user.id, roles))
+              }
+              onBanUser={() => asyncUpdateData(banUsers([user.id]))}
+              onDeleteUser={() => asyncUpdateData(deleteUsers([user.id]))}
+              onUnbanUser={() => asyncUpdateData(unbanUsers([user.id]))}
+              isBanned={user.banned}
             />
           );
         },
-      },
+      }),
     ],
-    [handleRoleChange],
+    [asyncUpdateData],
   );
 
   const table = useReactTable({
@@ -253,63 +218,7 @@ export function UsersDataTable({
     },
   });
 
-  const handleUnbanConfirm = async () => {
-    const banSelected = async () => {
-      const selectedUsers = table
-        .getSelectedRowModel()
-        .rows.map((row) => row.original.id);
-
-      await unbanUsers(selectedUsers);
-      await refreshData();
-    };
-
-    setLoading(true);
-    toast.promise(banSelected(), {
-      loading: "Unbanning Users...",
-      error: (e) => `Error: ${e.message}`,
-      success: "Users unbanned successfully!",
-      finally: () => setLoading(false),
-    });
-  };
-
-  const handleBanConfirm = async () => {
-    const banSelected = async () => {
-      const selectedUsers = table
-        .getSelectedRowModel()
-        .rows.map((row) => row.original.id);
-
-      await banUsers(selectedUsers);
-      await refreshData();
-    };
-
-    setLoading(true);
-    toast.promise(banSelected(), {
-      loading: "Banning Users...",
-      error: (e) => `Error: ${e.message}`,
-      success: "Users banned successfully!",
-      finally: () => setLoading(false),
-    });
-  };
-
-  const handleDeleteConfirm = () => {
-    const deleteSelected = async () => {
-      const selectedUsers = table
-        .getSelectedRowModel()
-        .rows.map((row) => row.original.id);
-
-      await deleteUsers(selectedUsers);
-      await refreshData();
-    };
-
-    setLoading(true);
-    toast.promise(deleteSelected(), {
-      loading: "Deleting Users...",
-      error: (e) => `Error: ${e.message}`,
-      success: "Users deleted successfully!",
-      finally: () => setLoading(false),
-    });
-  };
-
+  const someSelected = table.getSelectedRowModel().rows.length > 0;
   return (
     <div className="w-full">
       <div className="flex items-center justify-between gap-1 py-4">
@@ -321,75 +230,38 @@ export function UsersDataTable({
           }
           className="max-w-sm"
         />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">
-              Columns <ChevronDownIcon className="ml-2 h-4 w-4" />
+        <div className="flex gap-1">
+          <ConfirmDialog
+            onConfirm={() => asyncUpdateData(banUsers(selectedIds()))}
+            title="Are you sure want to ban the selected users?"
+            description="The selected users will be banned"
+          >
+            <Button
+              variant="outline"
+              className="flex items-center justify-center gap-2"
+              size="sm"
+              disabled={!someSelected}
+            >
+              <BanIcon size={16} />
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      <div className="mb-3 flex flex-row-reverse gap-2">
-        <Button variant="outline" onClick={refreshData}>
-          Refresh
-        </Button>
-        {table.getSelectedRowModel().rows.length > 0 && (
-          <>
-            <ConfirmDialog
-              onConfirm={handleUnbanConfirm}
-              title="Are you sure want to unban the selected users?"
-              description="The selected users will be unbanned"
+          </ConfirmDialog>
+          <ConfirmDialog
+            onConfirm={() => asyncUpdateData(deleteUsers(selectedIds()))}
+          >
+            <Button
+              variant="outline"
+              className="flex items-center justify-center gap-2"
+              size="sm"
+              disabled={!someSelected}
             >
-              <Button
-                variant="default"
-                className="flex items-center justify-center gap-2"
-              >
-                Unban
-              </Button>
-            </ConfirmDialog>
-            <ConfirmDialog
-              onConfirm={handleBanConfirm}
-              title="Are you sure want to ban the selected users?"
-              description="The selected users will be banned"
-            >
-              <Button
-                variant="destructive"
-                className="flex items-center justify-center gap-2"
-              >
-                <BanIcon size={16} />
-                <span className="hidden md:inline">Ban</span>
-              </Button>
-            </ConfirmDialog>
-            <ConfirmDialog onConfirm={handleDeleteConfirm}>
-              <Button
-                variant="destructive"
-                className="flex items-center justify-center gap-2"
-              >
-                <TrashIcon size={16} />
-                <span className="hidden md:inline">Delete</span>
-              </Button>
-            </ConfirmDialog>
-          </>
-        )}
+              <TrashIcon size={16} />
+            </Button>
+          </ConfirmDialog>
+          <Button variant="outline" onClick={refreshData} size="sm">
+            <RefreshCcwIcon size={16} />
+          </Button>
+          <DataTableViewOptions table={table} />
+        </div>
       </div>
       <div className="rounded-md border">
         <Table>
